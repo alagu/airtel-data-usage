@@ -3,6 +3,7 @@ require 'data_mapper'
 require 'mechanize'
 require 'xmlsimple'
 require 'time'
+require 'gruff'
 require './init'
 require './model'
 
@@ -46,6 +47,24 @@ def usage_data(phone, password)
   }
 end
 
+def draw_graphs
+  g = Gruff::StackedArea.new
+  g.title = "Airtel Usage for #{Usage.first.phone}"
+  labels = {}
+  consumed = []
+  available = []
+  Usage.all.each_with_index do |usage, index|
+    labels[index] = usage.time.strftime("%d/%m %l%P")
+    consumed.push usage.consumed
+    available.push usage.available
+  end
+  g.labels = labels
+  g.data :consumed, consumed
+  g.data :available, available
+  g.write('usage_all.png')
+
+end
+
 
 if ARGV.length != 1
   puts "Invalid format"
@@ -58,8 +77,8 @@ else
 
   begin
     usage_data = Usage.create(data)
+    draw_graphs()
   rescue
     puts "Already inserted"
   end
-  pp data
 end
