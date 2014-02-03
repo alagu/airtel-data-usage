@@ -77,8 +77,8 @@ else
 
   begin
     usage_data = Usage.create(data)
-    draw_graphs()
   rescue
     puts "Already inserted"
   end
+  draw_graphs()
 end
